@@ -2,7 +2,9 @@
 namespace app\controllers\api;
 
 use app\controllers\BaseAPIController;
+use app\DTOs\product\ShowProductRequestDTO;
 use app\services\product\ProductService;
+use app\validations\product\ShowProductValidation;
 use Doctrine\DBAL\Exception;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -15,10 +17,22 @@ class ProductController extends BaseAPIController
         parent::__construct();
     }
 
-    public function getAll(Response $response): Response|MessageInterface
+    public function index(Response $response): Response|MessageInterface
     {
         try {
             return $this->apiSuccess($response, $this->productService->getAll());
+        } catch (Exception $exception) {
+            return $this->apiError($response, $exception->getMessage());
+        }
+    }
+
+    public function show(Request $request, Response $response): MessageInterface
+    {
+        try {
+            $showProductValidation = new ShowProductValidation($request);
+            $showProductRequestDTO = new ShowProductRequestDTO($showProductValidation->validate());
+
+            return $this->apiSuccess($response, $this->productService->getById($showProductRequestDTO));
         } catch (Exception $exception) {
             return $this->apiError($response, $exception->getMessage());
         }

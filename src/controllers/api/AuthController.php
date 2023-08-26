@@ -23,8 +23,7 @@ class AuthController extends BaseAPIController
     public function login(Request $request, Response $response): MessageInterface
     {
         try {
-            $loginValidation = new LoginValidation($request);
-            $loginValidation->validate();
+            $loginValidation = new LoginValidation($request);;
 
             $loginDTO = new LoginRequestDTO($loginValidation->validate());
 
@@ -38,7 +37,6 @@ class AuthController extends BaseAPIController
     {
         try {
             $registerValidation = new RegisterValidation($request);
-            $registerValidation->validate();
 
             $registerDTO = new RegisterRequestDTO($registerValidation->validate());
 

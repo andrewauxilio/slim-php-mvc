@@ -3,8 +3,6 @@
 namespace app\validations;
 
 use app\exceptions\validation\ValidationException;
-use GuzzleHttp\Psr7\Response;
-use Exception;
 use Psr\Http\Message\MessageInterface;
 
 class BaseValidation
