@@ -23,21 +23,4 @@ class ProductController extends BaseAPIController
             return $this->apiError($response, $exception->getMessage());
         }
     }
-
-//    private function fetchProductsFromDatabase(): array
-//    {
-//        $query = "SELECT id, name, price FROM products";
-//        $result = $this->databaseService->getConnection()->fetchAllAssociative($query);
-//
-//        $products = [];
-//        foreach ($result as $row) {
-//            $products[] = new ProductModel(
-//                $row['id'],
-//                $row['name'],
-//                (float) $row['price']
-//            );
-//        }
-//
-//        return $products;
-//    }
 }
