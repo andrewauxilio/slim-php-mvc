@@ -1,5 +1,6 @@
 <?php
 
+use app\controllers\api\AuthController;
 use app\controllers\api\ProductController;
 use DI\Container;
 use Slim\Factory\AppFactory;
@@ -15,4 +16,8 @@ $container->set('database', function () {
 
 $container->set('productController', function ($container) {
     return new ProductController($container->get('database'));
+});
+
+$container->set('authController', function ($container) {
+    return new AuthController($container->get('database'));
 });
