@@ -3,13 +3,15 @@
 namespace app\middlewares;
 
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
 class AuthMiddleware implements MiddlewareInterface
 {
-    public function process(ServerRequestInterface $request, RequestHandler $handler): Response
+    public function process(ServerRequestInterface $request, RequestHandler $handler): ResponseInterface
     {
         // Your authentication logic here
         $session = $request->getHeaderLine('Authorization');

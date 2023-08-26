@@ -2,41 +2,52 @@
 
 namespace app\validations;
 
+use app\exceptions\validation\ValidationException;
 use GuzzleHttp\Psr7\Response;
+use Exception;
 use Psr\Http\Message\MessageInterface;
 
 class BaseValidation
 {
-    protected array $fields;
+    protected array $validatedFields;
     protected array $request;
     protected array $requestFields;
 
+    /**
+     * @throws ValidationException
+     */
     public function validate(): array|MessageInterface
     {
         $failedValidations = [];
+
+        // Check if fields are allowed
         foreach ($this->requestFields as $requestField) {
-            if (!array_key_exists($requestField, $this->fields)) {
-               $failedValidations[] = $requestField;
+            if (!array_key_exists($requestField, $this->validatedFields)) {
+               $failedValidations[] = "Field $requestField is not allowed";
+            } else {
+                $field = $this->validatedFields[$requestField];
+                // Check if field is of the correct type
+                if (array_key_exists($requestField, $this->request)) {
+                    $fieldType = gettype($this->request[$requestField]);
+                    if ($fieldType !== $field['type']) {
+                        $failedValidations[] = "Field $requestField must be of type $field[type]";
+                    }
+                }
             }
         }
 
-        if (count($failedValidations) > 0) {
-            return $this->fail('Missing required fields: ' . implode(', ', $failedValidations));
-        } else {
-            return $this->success();
+        // Check if required fields are present
+        foreach ($this->validatedFields as $validatedField => $field) {
+            if ($field['required'] && !in_array($validatedField, $this->requestFields)) {
+                $failedValidations[] = "Field $validatedField is required";
+            }
         }
-    }
 
-    public function success(): array
-    {
+        // Throw exception if any validations failed
+        if (count($failedValidations) > 0) {
+            throw new ValidationException($failedValidations);
+        }
+
         return $this->request;
-    }
-
-    public function fail(string $message): MessageInterface
-    {
-        $responseBody = ['message' => $message];
-        $response = new Response(401, [], json_encode($responseBody));
-
-        return $response->withHeader('Content-Type', 'application/json');
     }
 }

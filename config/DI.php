@@ -1,10 +1,10 @@
 <?php
 
-use app\controllers\api\AuthController;
-use app\controllers\api\ProductController;
+use app\services\auth\AuthService;
+use app\services\DatabaseService;
+use app\services\product\ProductService;
 use DI\Container;
 use Slim\Factory\AppFactory;
-use app\services\DatabaseService;
 
 $container = new Container();
 AppFactory::setContainer($container);
@@ -14,10 +14,10 @@ $container->set('database', function () {
     return new DatabaseService();
 });
 
-$container->set('productController', function ($container) {
-    return new ProductController($container->get('database'));
+$container->set('productService', function ($container) {
+    return new ProductService($container->get('database'));
 });
 
-$container->set('authController', function ($container) {
-    return new AuthController($container->get('database'));
+$container->set('authService', function ($container) {
+    return new AuthService($container->get('database'));
 });
