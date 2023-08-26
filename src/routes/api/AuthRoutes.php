@@ -22,4 +22,4 @@ $app->group('/api', function (RouteCollectorProxy $group) use ($container) {
 
         return $authController->register($request, $response);
     });
-})->add(AuthMiddleware::class);
+})->add($container->get(AuthMiddleware::class));

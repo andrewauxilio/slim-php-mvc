@@ -2,30 +2,53 @@
 
 namespace app\middlewares;
 
+use app\services\DatabaseService;
+use DateTime;
+use Doctrine\DBAL\Exception;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\MessageInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
 class AuthMiddleware implements MiddlewareInterface
 {
-    public function process(ServerRequestInterface $request, RequestHandler $handler): ResponseInterface
+    public function __construct(private readonly DatabaseService $databaseService)
+    {
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function process(ServerRequestInterface $request, RequestHandler $handler): Response
     {
         // Your authentication logic here
-        $session = $request->getHeaderLine('Authorization');
+        $cookieParams = $request->getCookieParams();
+        $session = $cookieParams['SESSION'];
 
-        $authenticated = true;
+        $dbSession = $this->databaseService
+            ->getConnection()
+            ->fetchAssociative("SELECT * FROM user_sessions WHERE session_id = ?", [$session]);
 
-        // Validate the token, check permissions, etc.
-        if ($authenticated) {
-            return $handler->handle($request);
-        } else {
-            $responseBody = ['message' => 'Unauthorized'];
-            $response = new Response(401, [], json_encode($responseBody));
-
-            return $response->withHeader('Content-Type', 'application/json');
+        if (!$dbSession) {
+            return $this->unauthorized();
         }
+
+        if (new DateTime($dbSession['expiry_at']) < new DateTime()) {
+            return $this->unauthorized('Session expired, please log in again');
+        }
+
+        return $handler->handle($request);
+
+    }
+
+    private function unauthorized(string $message = 'Unauthorized'): MessageInterface
+    {
+        $responseBody = ['message' => $message];
+        $response = new Response(401, [], json_encode($responseBody));
+        $response->withHeader('Content-Type', 'application/json');
+
+        return $response;
     }
 }

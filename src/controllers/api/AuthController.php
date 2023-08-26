@@ -2,6 +2,7 @@
 
 namespace app\controllers\api;
 
+use app\controllers\BaseAPIController;
 use app\DTOs\auth\LoginRequestDTO;
 use app\DTOs\auth\RegisterRequestDTO;
 use app\services\auth\AuthService;
@@ -12,38 +13,29 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\MessageInterface;
 
-class AuthController
+class AuthController extends BaseAPIController
 {
     public function __construct(private readonly AuthService $authService)
     {
+        parent::__construct();
     }
 
     public function login(Request $request, Response $response): MessageInterface
     {
-        $response = $response->withHeader('Content-Type', 'application/json');
-
         try {
             $loginValidation = new LoginValidation($request);
             $loginValidation->validate();
 
             $loginDTO = new LoginRequestDTO($loginValidation->validate());
 
-            $user = $this->authService->login($loginDTO);
-
-            $response->getBody()->write(json_encode($user));
-
-            return $response;
+            return $this->apiSuccess($response, $this->authService->login($loginDTO));
         } catch (Exception $exception) {
-            $response->getBody()->write(json_encode(['error' => $exception->getMessage()]));
-
-            return $response;
+            return $this->apiError($response, $exception->getMessage());
         }
     }
 
     public function register(Request $request, Response $response): MessageInterface
     {
-        $response = $response->withHeader('Content-Type', 'application/json');
-
         try {
             $registerValidation = new RegisterValidation($request);
             $registerValidation->validate();
@@ -52,13 +44,9 @@ class AuthController
 
             $this->authService->register($registerDTO);
 
-            $response->getBody()->write(json_encode(['success' => 'User registered successfully']));
-
-            return $response;
+            return $this->apiSuccess($response, ['success' => 'User registered successfully']);
         } catch (Exception $exception) {
-            $response->getBody()->write(json_encode(['error' => $exception->getMessage()]));
-
-            return $response;
+            return $this->apiError($response, $exception->getMessage());
         }
     }
 }

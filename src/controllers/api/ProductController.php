@@ -1,32 +1,27 @@
 <?php
 namespace app\controllers\api;
 
-use app\models\ProductModel;
-use app\services\DatabaseService;
+use app\controllers\BaseAPIController;
+use app\services\product\ProductService;
 use Doctrine\DBAL\Exception;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\MessageInterface;
 
-class ProductController
+class ProductController extends BaseAPIController
 {
-    public function __construct(private readonly DatabaseService $databaseService)
+    public function __construct(private readonly ProductService $productService)
     {
+        parent::__construct();
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getAll(): array
+    public function getAll(Response $response): Response|MessageInterface
     {
-        return $this->databaseService->getConnection()->fetchAllAssociative('SELECT * FROM products');
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getById(int $id = 1): array
-    {
-        return $this->databaseService
-            ->getConnection()
-            ->fetchAssociative("SELECT * FROM products WHERE id = ?", [$id]);
+        try {
+            return $this->apiSuccess($response, $this->productService->getAll());
+        } catch (Exception $exception) {
+            return $this->apiError($response, $exception->getMessage());
+        }
     }
 
 //    private function fetchProductsFromDatabase(): array
