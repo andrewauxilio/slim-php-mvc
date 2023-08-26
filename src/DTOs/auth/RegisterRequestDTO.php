@@ -23,6 +23,11 @@ class RegisterRequestDTO
         return $this->data['birthDate'];
     }
 
+    public function bio(): string
+    {
+        return $this->data['bio'];
+    }
+
     public function email(): string
     {
         return $this->data['email'];

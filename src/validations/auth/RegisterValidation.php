@@ -23,6 +23,10 @@ class RegisterValidation extends BaseValidation
                 'required' => true,
                 'type' => 'string'
             ],
+            'bio' => [
+                'required' => false,
+                'type' => 'string'
+            ],
             'birthDate' => [
                 'required' => true,
                 'type' => 'string'

@@ -4,10 +4,10 @@ namespace app\controllers\api;
 
 use app\DTOs\auth\LoginRequestDTO;
 use app\DTOs\auth\RegisterRequestDTO;
-use app\exceptions\validation\ValidationException;
 use app\services\auth\AuthService;
 use app\validations\auth\LoginValidation;
 use app\validations\auth\RegisterValidation;
+use Exception;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\MessageInterface;
@@ -33,8 +33,8 @@ class AuthController
             $response->getBody()->write(json_encode($user));
 
             return $response;
-        } catch (ValidationException $exception) {
-            $response->getBody()->write(json_encode(['error' => $exception->getErrors()]));
+        } catch (Exception $exception) {
+            $response->getBody()->write(json_encode(['error' => $exception->getMessage()]));
 
             return $response;
         }
@@ -50,13 +50,13 @@ class AuthController
 
             $registerDTO = new RegisterRequestDTO($registerValidation->validate());
 
-            $user = $this->authService->register($registerDTO);
+            $this->authService->register($registerDTO);
 
-            $response->getBody()->write(json_encode($user));
+            $response->getBody()->write(json_encode(['success' => 'User registered successfully']));
 
             return $response;
-        } catch (ValidationException $exception) {
-            $response->getBody()->write(json_encode(['error' => $exception->getErrors()]));
+        } catch (Exception $exception) {
+            $response->getBody()->write(json_encode(['error' => $exception->getMessage()]));
 
             return $response;
         }
