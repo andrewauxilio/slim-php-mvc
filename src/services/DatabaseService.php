@@ -13,7 +13,7 @@ class DatabaseService
     /**
      * @throws Exception
      */
-    private function __construct()
+    public function __construct()
     {
         $connectionParams = [
             'dbname' => $_ENV['DB_NAME'],
@@ -31,6 +31,7 @@ class DatabaseService
         if (self::$instance === null) {
             self::$instance = new DatabaseService();
         }
+
         return self::$instance;
     }
 

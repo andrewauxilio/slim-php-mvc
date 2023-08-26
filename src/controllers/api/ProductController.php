@@ -6,11 +6,8 @@ use Doctrine\DBAL\Exception;
 
 class ProductController
 {
-    private readonly DatabaseService $databaseService;
-
-    public function __construct()
+    public function __construct(private readonly DatabaseService $databaseService)
     {
-        $this->databaseService = DatabaseService::getInstance();
     }
 
     /**
