@@ -111,4 +111,21 @@ class AuthService
                 'updated_at' => (new DateTime())->format('Y-m-d H:i:s')
             ]);
     }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function logout(string $sessionId): void
+    {
+        $this->databaseService
+            ->getConnection()
+            ->update(
+                'user_sessions',
+                [
+                    'is_valid' => 0,
+                    'expiry_at' => (new DateTime())->format('Y-m-d H:i:s')
+                ],
+                ['session_id' => $sessionId]
+            );
+    }
 }

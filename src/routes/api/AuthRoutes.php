@@ -13,5 +13,5 @@ $app->group('/api', function (RouteCollectorProxy $group) use ($container) {
 
     $group->post('/auth/login', [$authController, 'login']);
     $group->post('/auth/register', [$authController, 'register']);
-
-})->add($container->get(AuthMiddleware::class));
+    $group->post('/auth/logout', [$authController, 'logout']);
+});

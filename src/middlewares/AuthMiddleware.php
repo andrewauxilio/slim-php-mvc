@@ -47,8 +47,7 @@ class AuthMiddleware implements MiddlewareInterface
     {
         $responseBody = ['message' => $message];
         $response = new Response(401, [], json_encode($responseBody));
-        $response->withHeader('Content-Type', 'application/json');
 
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }

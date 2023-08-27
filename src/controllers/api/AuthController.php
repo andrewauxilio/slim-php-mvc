@@ -5,6 +5,7 @@ namespace app\controllers\api;
 use app\controllers\BaseAPIController;
 use app\DTOs\auth\LoginRequestDTO;
 use app\DTOs\auth\RegisterRequestDTO;
+use app\helpers\AuthHelper;
 use app\services\auth\AuthService;
 use app\validations\auth\LoginValidation;
 use app\validations\auth\RegisterValidation;
@@ -33,7 +34,7 @@ class AuthController extends BaseAPIController
         }
     }
 
-    public function register(Request $request, Response $response): MessageInterface
+    public function register(Request $request, Response $response, array $args): MessageInterface
     {
         try {
             $registerValidation = new RegisterValidation($request);
@@ -42,7 +43,24 @@ class AuthController extends BaseAPIController
 
             $this->authService->register($registerDTO);
 
-            return $this->apiSuccess($response, ['success' => 'User registered successfully']);
+            return $this->apiSuccess($response, ['User registered successfully']);
+        } catch (Exception $exception) {
+            return $this->apiError($response, $exception->getMessage());
+        }
+    }
+
+    public function logout(Request $request, Response $response, array $args): MessageInterface
+    {
+        try {
+            $sessionId = AuthHelper::extractSessionFromRequest($request);
+
+            if (!$sessionId) {
+                return $this->apiSuccess($response, ['User logged out']);
+            }
+
+            $this->authService->logout($sessionId);
+
+            return $this->apiSuccess($response, ['User logged out']);
         } catch (Exception $exception) {
             return $this->apiError($response, $exception->getMessage());
         }
