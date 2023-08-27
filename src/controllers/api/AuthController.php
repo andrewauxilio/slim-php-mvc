@@ -20,7 +20,7 @@ class AuthController extends BaseAPIController
         parent::__construct();
     }
 
-    public function login(Request $request, Response $response): MessageInterface
+    public function login(Request $request, Response $response, array $args): MessageInterface
     {
         try {
             $loginValidation = new LoginValidation($request);;

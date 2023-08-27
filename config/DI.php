@@ -1,5 +1,6 @@
 <?php
 
+use app\controllers\api\AuthController;
 use app\middlewares\AuthMiddleware;
 use app\services\auth\AuthService;
 use app\services\DatabaseService;
@@ -10,19 +11,25 @@ use Slim\Factory\AppFactory;
 $container = new Container();
 AppFactory::setContainer($container);
 
-// Register services, such as database, logger, etc.
-$container->set('database', function () {
+$container->set(DatabaseService::class, function () {
     return new DatabaseService();
 });
 
-$container->set('authMiddleware', function ($container) {
-    return new AuthMiddleware($container->get('database'));
+// middlewares
+$container->set(AuthMiddleware::class, function ($container) {
+    return new AuthMiddleware($container->get(DatabaseService::class));
 });
 
-$container->set('productService', function ($container) {
-    return new ProductService($container->get('database'));
+// services
+$container->set(ProductService::class, function ($container) {
+    return new ProductService($container->get(DatabaseService::class));
 });
 
-$container->set('authService', function ($container) {
-    return new AuthService($container->get('database'));
+$container->set(AuthService::class, function ($container) {
+    return new AuthService($container->get(DatabaseService::class));
+});
+
+// controllers
+$container->set(AuthController::class, function ($container) {
+    return new AuthController($container->get(AuthService::class));
 });
