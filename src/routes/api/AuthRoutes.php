@@ -5,7 +5,6 @@ global $app;
 global $container;
 
 use app\controllers\api\AuthController;
-use app\middlewares\AuthMiddleware;
 use Slim\Routing\RouteCollectorProxy;
 
 $app->group('/api', function (RouteCollectorProxy $group) use ($container) {
